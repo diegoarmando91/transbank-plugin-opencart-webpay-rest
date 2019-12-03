@@ -1,8 +1,11 @@
 <?php
-require_once('transbank/vendor/autoload.php');
+namespace OpencartWebpayRest;
+
+require_once(__DIR__ . '/../transbank/vendor/autoload.php');
 
 use Transbank\Webpay\Configuration;
 use Transbank\Webpay\Webpay;
+use Transbank\Webpay\WebpayPlus;
 use Transbank\Webpay\WebpayPlus\Transaction;
 
 class TransbankSdkWebpay
@@ -60,7 +63,7 @@ class TransbankSdkWebpay
             if ($tokenWs == null) {
                 throw new \Exception("El token webpay es requerido");
             }
-    
+            
             return Transaction::commit($tokenWs);
         } catch (\Exception $e) {
             $result = [

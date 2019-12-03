@@ -1,16 +1,17 @@
 <?php
 
+use OpencartWebpayRest\TransbankSdkWebpay;
 use Transbank\Webpay\WebpayPlus\TransactionCommitResponse;
 
-require_once(DIR_SYSTEM . 'library/TransbankSdkWebpay.php');
-require_once('libwebpay/LogHandler.php');
+require_once(DIR_SYSTEM . 'library/OpencartWebpayRest/TransbankSdkWebpay.php');
+require_once('libwebpay_rest/LogHandler.php');
 
-class ControllerExtensionPaymentWebpay extends Controller {
+class ControllerExtensionPaymentWebpayRest extends Controller {
 
     private $transbankSdkWebpay = null;
 
     private function loadResources() {
-        $this->load->language('extension/payment/webpay');
+        $this->load->language('extension/payment/webpay_rest');
         $this->load->model('setting/setting'); //load model in: $this->model_setting_setting
         $this->load->model('localisation/order_status'); //load model in: $this->model_localisation_order_status
         $this->load->model('checkout/order'); //load model in: $this->model_checkout_order
@@ -23,9 +24,9 @@ class ControllerExtensionPaymentWebpay extends Controller {
     private function getConfig() {
         $config = array(
             "ECOMMERCE" => "opencart",
-            "MODO" => $this->config->get('payment_webpay_test_mode'),
-            "API_KEY" => $this->config->get('payment_webpay_api_key'),
-            "COMMERCE_CODE" => $this->config->get('payment_webpay_commerce_code'),
+            "MODO" => $this->config->get('payment_webpay_rest_test_mode'),
+            "API_KEY" => $this->config->get('payment_webpay_rest_api_key'),
+            "COMMERCE_CODE" => $this->config->get('payment_webpay_rest_commerce_code'),
             "VENTA_DESC" => array(
                 "VD" => "Venta Deb&iacute;to",
                 "VN" => "Venta Normal",
@@ -59,7 +60,7 @@ class ControllerExtensionPaymentWebpay extends Controller {
         $dataPaymentHash = $amount . $orderId. json_encode($itemsId);
         $paymentHash = md5($dataPaymentHash);
 
-        $url = $this->url->link('extension/payment/webpay/callback', '', 'SSL');
+        $url = $this->url->link('extension/payment/webpay_rest/callback', '', 'SSL');
         $url .= (parse_url($url, PHP_URL_QUERY) ? '&' : '?') . ('ph_=' . $paymentHash);
         $returnUrl = $url;
 
@@ -71,7 +72,7 @@ class ControllerExtensionPaymentWebpay extends Controller {
 
         $this->session->data['paymentOk'] = 'WAITING';
 
-        return $this->load->view('extension/payment/webpay', $data);
+        return $this->load->view('extension/payment/webpay_rest', $data);
     }
 
     public function callback() {
@@ -92,7 +93,7 @@ class ControllerExtensionPaymentWebpay extends Controller {
                 'detail' => 'La compra ha sido cancelada por el usuario durante el proceso de pago'
             );
     
-            $orderStatusId = $this->config->get('payment_webpay_canceled_order_status');
+            $orderStatusId = $this->config->get('payment_webpay_rest_canceled_order_status');
             $orderComment = 'Pago cancelado: ' . json_encode($comment);
             $orderNotifyToUser = false;
     
@@ -110,7 +111,7 @@ class ControllerExtensionPaymentWebpay extends Controller {
                 'detail' => 'El token no ha sido enviado'
             );
 
-            $orderStatusId = $this->config->get('payment_webpay_canceled_order_status');
+            $orderStatusId = $this->config->get('payment_webpay_rest_canceled_order_status');
             $orderComment = 'Pago cancelado: ' . json_encode($comment);
             $orderNotifyToUser = false;
 
@@ -140,7 +141,7 @@ class ControllerExtensionPaymentWebpay extends Controller {
                 'detail' => 'Carro inválido'
             );
 
-            $orderStatusId = $this->config->get('payment_webpay_canceled_order_status');
+            $orderStatusId = $this->config->get('payment_webpay_rest_canceled_order_status');
             $orderComment = 'Pago cancelado: ' . json_encode($comment);
             $orderNotifyToUser = false;
 
@@ -172,7 +173,7 @@ class ControllerExtensionPaymentWebpay extends Controller {
                     'vci' => $result->getVci()
                 );
 
-                $orderStatusId = $this->config->get('payment_webpay_completed_order_status');
+                $orderStatusId = $this->config->get('payment_webpay_rest_completed_order_status');
                 $orderComment = 'Pago exitoso: ' . json_encode($comment);
                 $orderNotifyToUser = true;
 
@@ -196,7 +197,7 @@ class ControllerExtensionPaymentWebpay extends Controller {
                     );
                 }
 
-                $orderStatusId = $this->config->get('payment_webpay_rejected_order_status');
+                $orderStatusId = $this->config->get('payment_webpay_rest_rejected_order_status');
                 $orderComment = 'Pago fallido: ' . json_encode($comment);
                 $orderNotifyToUser = true;
 
@@ -243,7 +244,7 @@ class ControllerExtensionPaymentWebpay extends Controller {
         $data['text_response'] = $this->language->get($error_id);
         $data['continue'] = $this->url->link('checkout/checkout');
 
-        $this->response->setOutput($this->load->view('extension/payment/webpay_error', $data));
+        $this->response->setOutput($this->load->view('extension/payment/webpay_rest_error', $data));
     }
 
     private function failView() {
@@ -263,7 +264,7 @@ class ControllerExtensionPaymentWebpay extends Controller {
         $data['reject_text'] = $this->session->data['reject_text'];
         $data['continue'] = $this->url->link('checkout/checkout');
 
-        $this->response->setOutput($this->load->view('extension/payment/webpay_fail', $data));
+        $this->response->setOutput($this->load->view('extension/payment/webpay_rest_fail', $data));
     }
 
     private function successView() {
@@ -319,18 +320,18 @@ class ControllerExtensionPaymentWebpay extends Controller {
         $data['tbk_tipo_cuotas'] = $installmentType;
         $data['tbk_monto'] = $result['amount'];
         $data['tbk_numero_cuotas'] = $result['installmentsNumber'];
-        $this->session->data['transbank_webpay_result'] = $this->load->view('extension/payment/webpay_success', $data);
+        $this->session->data['transbank_webpay_rest_result'] = $this->load->view('extension/payment/webpay_rest_success', $data);
         $this->response->redirect($this->url->link('checkout/success', 'language=' . $this->config->get('config_language'), 'SSL'));
     }
 
     private function toRedirect($url, $data) {
-        echo  "<form action='$url' method='POST' name='webpayForm'>";
+        echo  "<form action='$url' method='POST' name='webpayRestForm'>";
         foreach ($data as $name => $value) {
             echo "<input type='hidden' name='".htmlentities($name)."' value='".htmlentities($value)."'>";
         }
         echo "</form>";
         echo "<script language='JavaScript'>"
-            ."document.webpayForm.submit();"
+            ."document.webpayRestForm.submit();"
             ."</script>";
     }
 }

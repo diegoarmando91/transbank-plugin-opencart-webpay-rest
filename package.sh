@@ -15,7 +15,7 @@ FILE2="install.xml"
 sed -i.bkp "s/PLUGIN_VERSION = '1.0.0';/PLUGIN_VERSION = '${TRAVIS_TAG}';/g" "$SRC_DIR/$FILE1"
 sed -i.bkp "s/<version>1.0.0/<version>${TRAVIS_TAG}/g" "$SRC_DIR/$FILE2"
 
-PLUGIN_FILE="plugin-transbank-webpay-opencart3-$TRAVIS_TAG.ocmod.zip"
+PLUGIN_FILE="plugin-transbank-webpay-rest-opencart3-$TRAVIS_TAG.ocmod.zip"
 
 cp CHANGELOG.md $SRC_DIR
 cp LICENSE $SRC_DIR

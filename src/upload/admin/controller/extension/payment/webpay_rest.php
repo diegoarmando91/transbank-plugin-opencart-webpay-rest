@@ -1,9 +1,9 @@
 <?php
 
-require_once(DIR_CATALOG.'controller/extension/payment/libwebpay/HealthCheck.php');
-require_once(DIR_CATALOG.'controller/extension/payment/libwebpay/LogHandler.php');
+require_once(DIR_CATALOG.'controller/extension/payment/libwebpay_rest/HealthCheck.php');
+require_once(DIR_CATALOG.'controller/extension/payment/libwebpay_rest/LogHandler.php');
 
-class ControllerExtensionPaymentWebpay extends Controller {
+class ControllerExtensionPaymentWebpayRest extends Controller {
 
     private $error = array();
 
@@ -16,7 +16,7 @@ class ControllerExtensionPaymentWebpay extends Controller {
     private $sections = array('commerce_code', 'api_key', 'test_mode');
 
     private function loadResources() {
-        $this->load->language('extension/payment/webpay');
+        $this->load->language('extension/payment/webpay_rest');
         $this->load->model('setting/setting'); //load model in: $this->model_setting_setting
         $this->load->model('localisation/order_status'); //load model in: $this->model_localisation_order_status
     }
@@ -32,19 +32,20 @@ class ControllerExtensionPaymentWebpay extends Controller {
 
         $this->document->setTitle($this->language->get('heading_title'));;
 
+        
         $redirs = array('authorize', 'finish', 'error', 'reject');
         foreach ($redirs as $value) {
-            $this->request->post['payment_webpay_url_'.$value] = HTTP_CATALOG . 'index.php?route=extension/payment/webpay/' .$value;
+            $this->request->post['payment_webpay_rest_url_'.$value] = HTTP_CATALOG . 'index.php?route=extension/payment/webpay_rest/' .$value;
         }
 
         // validacion de modificaciones
 
         if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validate()) {
-            $this->model_setting_setting->editSetting('payment_webpay', $this->request->post);
+            $this->model_setting_setting->editSetting('payment_webpay_rest', $this->request->post);
 
             $this->session->data['success'] = $this->language->get('text_success');
 
-            $this->response->redirect($this->url->link('extension/payment/webpay', 'user_token=' .$this->session->data['user_token'] . '&type=payment', true));
+            $this->response->redirect($this->url->link('extension/payment/webpay_rest', 'user_token=' .$this->session->data['user_token'] . '&type=payment', true));
         }
 
         // se imprimen errores si existen
@@ -56,8 +57,8 @@ class ControllerExtensionPaymentWebpay extends Controller {
         }
 
         foreach ($this->sections as $value) {
-            if (isset($this->error['payment_webpay_'.$value])) {
-                $data['error_'.$value] = $this->error['payment_webpay_'.$value];
+            if (isset($this->error['payment_webpay_rest_'.$value])) {
+                $data['error_'.$value] = $this->error['payment_webpay_rest_'.$value];
             } else {
                 $data['error_'.$value] = '';
             }
@@ -91,36 +92,36 @@ class ControllerExtensionPaymentWebpay extends Controller {
         );
 
         $data['breadcrumbs'][] = array(
-            'text' => $this->language->get('text_webpay'),
+            'text' => $this->language->get('text_webpay_rest'),
             'href' => $this->url->link('marketplace/extension', 'user_token=' . $this->session->data['user_token'] . '&type=payment', true),
         );
 
         $data['breadcrumbs'][] = array(
             'text' => $this->language->get('heading_title'),
-            'href' => $this->url->link('extension/payment/webpay', 'user_token=' . $this->session->data['user_token'], true),
+            'href' => $this->url->link('extension/payment/webpay_rest', 'user_token=' . $this->session->data['user_token'], true),
         );
 
-        $data['action'] = $this->url->link('extension/payment/webpay', 'user_token=' . $this->session->data['user_token'], true);
+        $data['action'] = $this->url->link('extension/payment/webpay_rest', 'user_token=' . $this->session->data['user_token'], true);
 
         $data['cancel'] = $this->url->link('marketplace/extension', 'user_token=' . $this->session->data['user_token'] . '&type=payment', true);
 
         foreach ($this->sections as $value) {
-            if (isset($this->request->post['payment_webpay_'.$value])) {
-                $data['payment_webpay_'.$value] = $this->request->post['payment_webpay_'.$value];
-            } else if ($this->config->get('payment_webpay_'.$value)) {
-                $data['payment_webpay_'.$value] = $this->config->get('payment_webpay_'.$value);
+            if (isset($this->request->post['payment_webpay_rest_'.$value])) {
+                $data['payment_webpay_rest_'.$value] = $this->request->post['payment_webpay_rest_'.$value];
+            } else if ($this->config->get('payment_webpay_rest_'.$value)) {
+                $data['payment_webpay_rest_'.$value] = $this->config->get('payment_webpay_rest_'.$value);
             } else {
-                $data['payment_webpay_'.$value] = $this->default_config[$value];
+                $data['payment_webpay_rest_'.$value] = $this->default_config[$value];
             }
         }
 
         $selects = array('total', 'completed_order_status', 'rejected_order_status', 'canceled_order_status', 'geo_zone', 'sort_order', 'status');
 
         foreach ($selects as $value) {
-            if (isset($this->request->post['payment_webpay_'.$value])) {
-                $data['payment_webpay_'.$value] = $this->request->post['payment_webpay_'.$value];
+            if (isset($this->request->post['payment_webpay_rest_'.$value])) {
+                $data['payment_webpay_rest_'.$value] = $this->request->post['payment_webpay_rest_'.$value];
             } else {
-                $data['payment_webpay_'.$value] = $this->config->get('payment_webpay_'.$value);
+                $data['payment_webpay_rest_'.$value] = $this->config->get('payment_webpay_rest_'.$value);
             }
         }
 
@@ -138,18 +139,18 @@ class ControllerExtensionPaymentWebpay extends Controller {
             'ECOMMERCE' => 'opencart'
         );
 
-        if (isset($this->request->post['payment_webpay_commerce_code'])) {
+        if (isset($this->request->post['payment_webpay_rest_commerce_code'])) {
             $args = array(
-                'MODO' => $this->request->post['payment_webpay_test_mode'],
-                'COMMERCE_CODE' => $this->request->post['payment_webpay_commerce_code'],
-                'API_KEY' => $this->request->post['payment_webpay_api_key'],
+                'MODO' => $this->request->post['payment_webpay_rest_test_mode'],
+                'COMMERCE_CODE' => $this->request->post['payment_webpay_rest_commerce_code'],
+                'API_KEY' => $this->request->post['payment_webpay_rest_api_key'],
                 'ECOMMERCE' => 'opencart'
             );
-        } else if ($this->config->get('payment_webpay_commerce_code')) {
+        } else if ($this->config->get('payment_webpay_rest_commerce_code')) {
             $args = array(
-                'MODO' => $this->config->get('payment_webpay_test_mode'),
-                'COMMERCE_CODE' => $this->config->get('payment_webpay_commerce_code'),
-                'API_KEY' => $this->config->get('payment_webpay_api_key'),
+                'MODO' => $this->config->get('payment_webpay_rest_test_mode'),
+                'COMMERCE_CODE' => $this->config->get('payment_webpay_rest_commerce_code'),
+                'API_KEY' => $this->config->get('payment_webpay_rest_api_key'),
                 'ECOMMERCE' => 'opencart'
             );
         }
@@ -192,25 +193,25 @@ class ControllerExtensionPaymentWebpay extends Controller {
 
         $data['tb_max_logs_weight'] = $loghandler['config']['max_log_weight'];
 
-        $data['url_create_pdf_report'] = '../catalog/controller/extension/payment/libwebpay/CreatePdf.php?document=report';
-        $data['url_create_pdf_php_info'] = '../catalog/controller/extension/payment/libwebpay/CreatePdf.php?document=php_info';
-        $data['url_check_conn'] = '../catalog/controller/extension/payment/libwebpay/CheckConn.php';
+        $data['url_create_pdf_report'] = '../catalog/controller/extension/payment/libwebpay_rest/CreatePdf.php?document=report';
+        $data['url_create_pdf_php_info'] = '../catalog/controller/extension/payment/libwebpay_rest/CreatePdf.php?document=php_info';
+        $data['url_check_conn'] = '../catalog/controller/extension/payment/libwebpay_rest/CheckConn.php';
 
         $data['header'] = $this->load->controller('common/header');
         $data['column_left'] = $this->load->controller('common/column_left');
         $data['footer'] = $this->load->controller('common/footer');
 
-        $this->response->setOutput($this->load->view('extension/payment/webpay', $data));
+        $this->response->setOutput($this->load->view('extension/payment/webpay_rest', $data));
     }
 
     private function validate() {
 
-        if (!$this->user->hasPermission('modify', 'extension/payment/webpay')) {
+        if (!$this->user->hasPermission('modify', 'extension/payment/webpay_rest')) {
             $this->error['warning'] = $this->language->get('error_permission');
         }
 
         foreach ($this->sections as $value) {
-            if (!$this->request->post['payment_webpay_'.$value]) {
+            if (!$this->request->post['payment_webpay_rest_'.$value]) {
                 $this->error[$value] = $this->language->get('error_'.$value);
             }
         }

@@ -1,6 +1,8 @@
 <?php
 
-require_once(DIR_SYSTEM . 'library/TransbankSdkWebpay.php');
+use OpencartWebpayRest\TransbankSdkWebpay;
+
+require_once(DIR_SYSTEM . 'library/OpencartWebpayRest/TransbankSdkWebpay.php');
 require_once('LogHandler.php');
 
 class HealthCheck {

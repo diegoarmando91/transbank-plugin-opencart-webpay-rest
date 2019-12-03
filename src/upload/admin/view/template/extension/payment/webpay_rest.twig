@@ -3,7 +3,7 @@
     <div class="page-header">
         <div class="container-fluid">
             <div class="pull-right">
-                <button type="submit" name="form-webpay" data-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary">
+                <button type="submit" name="form-webpay_rest" data-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary">
                     <i class="fa fa-save"></i>
                 </button>
                 <a href="{{ cancel }}" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-default">
@@ -35,13 +35,13 @@
                 <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#tb_commerce_mod_info" name="button">{{ text_options }}</button>
             </div>
             <div class="panel-body">
-                <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-webpay" class="form-horizontal">
+                <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-webpay_rest" class="form-horizontal">
 
                     <div class="form-group">
-                        <label class="col-sm-2 control-label" for="payment_webpay_status">{{ entry_status }}</label>
+                        <label class="col-sm-2 control-label" for="payment_webpay_rest_status">{{ entry_status }}</label>
                         <div class="col-sm-5">
-                            <select name="payment_webpay_status" id="payment_webpay_status" class="form-control">
-                                {% if payment_webpay_status %}
+                            <select name="payment_webpay_rest_status" id="payment_webpay_rest_status" class="form-control">
+                                {% if payment_webpay_rest_status %}
                                 <option value="1" selected="selected">{{ text_enabled }}</option>
                                 <option value="0">{{ text_disabled }}</option>
                                 {% else %}
@@ -53,12 +53,12 @@
                     </div>
 
                     <div class="form-group required">
-                        <label class="col-sm-2 control-label" for="payment_webpay_test_mode">
+                        <label class="col-sm-2 control-label" for="payment_webpay_rest_test_mode">
                             <span data-toggle="tooltip" title="{{ help_test_mode }}"></span> {{ entry_test_mode }}
                         </label>
                         <div class="col-sm-5">
-                            <select class="form-control" name="payment_webpay_test_mode" id="payment_webpay_test_mode">
-                                {% if payment_webpay_test_mode == 'PRODUCCION' %}
+                            <select class="form-control" name="payment_webpay_rest_test_mode" id="payment_webpay_rest_test_mode">
+                                {% if payment_webpay_rest_test_mode == 'PRODUCCION' %}
                                 <option value="INTEGRACION">INTEGRACION</option>
                                 <option value="PRODUCCION" selected="selected">PRODUCCION</option>
                                 {% else %}
@@ -71,14 +71,14 @@
 
                     {# Commerce Code #}
                     <div class="form-group required">
-                        <label class="col-sm-2 control-label" for="payment_webpay_commerce_code">
+                        <label class="col-sm-2 control-label" for="payment_webpay_rest_commerce_code">
                             <span data-toggle="tooltip" title="{{ help_commerce_code }}"></span> {{entry_commerce_code}}
                         </label>
                         <div class="col-sm-5">
-                            <input type="text" name="payment_webpay_commerce_code"
-                                   placeholder="{{ webpay_commerce_code_placeholder }}"
-                                   id="payment_webpay_commerce_code"
-                                   value="{{ payment_webpay_commerce_code }}" class="form-control"
+                            <input type="text" name="payment_webpay_rest_commerce_code"
+                                   placeholder="{{ webpay_rest_commerce_code_placeholder }}"
+                                   id="payment_webpay_rest_commerce_code"
+                                   value="{{ payment_webpay_rest_commerce_code }}" class="form-control"
                                    style="font-family:monospace;"/>
                             {% if error_commerce_code %}
                                 <div class="text-danger">{{ error_commerce_code }}</div>
@@ -87,14 +87,14 @@
                     </div>
                     {# API Key #}
                     <div class="form-group required">
-                        <label class="col-sm-2 control-label" for="payment_webpay_commerce_code">
+                        <label class="col-sm-2 control-label" for="payment_webpay_rest_commerce_code">
                             <span data-toggle="tooltip" title="{{ help_api_key }}"></span> {{entry_api_key}}
                         </label>
                         <div class="col-sm-5">
-                            <input type="text" name="payment_webpay_api_key"
-                                   placeholder="{{ webpay_api_key_placeholder }}"
-                                   id="payment_webpay_api_key"
-                                   value="{{ payment_webpay_api_key }}" class="form-control"
+                            <input type="text" name="payment_webpay_rest_api_key"
+                                   placeholder="{{ webpay_rest_api_key_placeholder }}"
+                                   id="payment_webpay_rest_api_key"
+                                   value="{{ payment_webpay_rest_api_key }}" class="form-control"
                                    style="font-family:monospace;"/>
                             {% if error_api_key %}
                                 <div class="text-danger">{{ error_api_key }}</div>
@@ -103,10 +103,10 @@
                     </div>
 
                     <div class="form-group">
-                        <label class="col-sm-2 control-label" for="payment_webpay_completed_order_status">{{ entry_completed_order_status }}</label>
+                        <label class="col-sm-2 control-label" for="payment_webpay_rest_completed_order_status">{{ entry_completed_order_status }}</label>
                         <div class="col-sm-5">
-                            <select name="payment_webpay_completed_order_status" id="payment_webpay_completed_order_status" class="form-control">
-                                {% for order_status in order_statuses %} {% if order_status.order_status_id == payment_webpay_completed_order_status %}
+                            <select name="payment_webpay_rest_completed_order_status" id="payment_webpay_rest_completed_order_status" class="form-control">
+                                {% for order_status in order_statuses %} {% if order_status.order_status_id == payment_webpay_rest_completed_order_status %}
                                 <option value="{{ order_status.order_status_id }}" selected="selected">{{ order_status.name }}</option>
                                 {% else %}
                                 <option value="{{ order_status.order_status_id }}">{{ order_status.name }}</option>
@@ -116,10 +116,10 @@
                     </div>
 
                     <div class="form-group">
-                        <label class="col-sm-2 control-label" for="payment_webpay_rejected_order_status">{{ entry_rejected_order_status }}</label>
+                        <label class="col-sm-2 control-label" for="payment_webpay_rest_rejected_order_status">{{ entry_rejected_order_status }}</label>
                         <div class="col-sm-5">
-                            <select name="payment_webpay_rejected_order_status" id="payment_webpay_rejected_order_status" class="form-control">
-                                {% for order_status in order_statuses %} {% if order_status.order_status_id == payment_webpay_rejected_order_status %}
+                            <select name="payment_webpay_rest_rejected_order_status" id="payment_webpay_rest_rejected_order_status" class="form-control">
+                                {% for order_status in order_statuses %} {% if order_status.order_status_id == payment_webpay_rest_rejected_order_status %}
                                 <option value="{{ order_status.order_status_id }}" selected="selected">{{ order_status.name }}</option>
                                 {% else %}
                                 <option value="{{ order_status.order_status_id }}">{{ order_status.name }}</option>
@@ -129,10 +129,10 @@
                     </div>
 
                     <div class="form-group">
-                        <label class="col-sm-2 control-label" for="payment_webpay_canceled_order_status">{{ entry_canceled_order_status }}</label>
+                        <label class="col-sm-2 control-label" for="payment_webpay_rest_canceled_order_status">{{ entry_canceled_order_status }}</label>
                         <div class="col-sm-5">
-                            <select name="payment_webpay_canceled_order_status" id="payment_webpay_canceled_order_status" class="form-control">
-                                {% for order_status in order_statuses %} {% if order_status.order_status_id == payment_webpay_canceled_order_status %}
+                            <select name="payment_webpay_rest_canceled_order_status" id="payment_webpay_rest_canceled_order_status" class="form-control">
+                                {% for order_status in order_statuses %} {% if order_status.order_status_id == payment_webpay_rest_canceled_order_status %}
                                 <option value="{{ order_status.order_status_id }}" selected="selected">{{ order_status.name }}</option>
                                 {% else %}
                                 <option value="{{ order_status.order_status_id }}">{{ order_status.name }}</option>
@@ -142,9 +142,9 @@
                     </div>
 
                     <div class="form-group">
-                        <label class="col-sm-2 control-label" for="payment_webpay_sort_order">{{ entry_sort_order }}</label>
+                        <label class="col-sm-2 control-label" for="payment_webpay_rest_sort_order">{{ entry_sort_order }}</label>
                         <div class="col-sm-5">
-                            <input type="text" name="payment_webpay_sort_order" value="{{ payment_webpay_sort_order }}" placeholder="{{ entry_sort_order }}" id="payment_webpay_sort_order" class="form-control" />
+                            <input type="text" name="payment_webpay_rest_sort_order" value="{{ payment_webpay_rest_sort_order }}" placeholder="{{ entry_sort_order }}" id="payment_webpay_rest_sort_order" class="form-control" />
                         </div>
                     </div>
 

@@ -1,9 +1,9 @@
 <?php
-class ModelExtensionPaymentWebpay extends Model {
+class ModelExtensionPaymentWebpayRest extends Model {
 
 	public function getMethod($address, $total) {
 
-        $this->load->language('extension/payment/webpay');
+        $this->load->language('extension/payment/webpay_rest');
         $this->load->model('setting/setting');
 
         $status = false;
@@ -16,10 +16,10 @@ class ModelExtensionPaymentWebpay extends Model {
 
 		if ($status) {
 			$method_data = array(
-				'code' => 'webpay',
+				'code' => 'webpay_rest',
 				'title' => $this->language->get('text_title'),
 				'terms' => '',
-				'sort_order' => $this->config->get('payment_webpay_sort_order')
+				'sort_order' => $this->config->get('payment_webpay_rest_sort_order')
 			);
 		}
 

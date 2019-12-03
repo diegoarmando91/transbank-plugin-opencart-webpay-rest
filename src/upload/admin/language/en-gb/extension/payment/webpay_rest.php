@@ -7,7 +7,7 @@ $_['heading_title'] = 'Webpay Plus REST';
 $_['text_extension'] = 'Extensions';
 $_['text_success'] = '&Eacute;xito: ¡Se han modificado los detalles de la cuenta Webpay satisfactoriamente!';
 $_['text_edit'] = 'Editar Webpay Plus';
-$_['text_webpay'] = '<a href="http://www.transbank.cl" target="_blank"><img src="https://www.transbank.cl/public/img/Logo_Webpay3-01-50x50.png" alt="WebPay" title="WebPay" style="border: 1px solid #EEEEEE;" /></a>';
+$_['text_webpay_rest'] = '<a href="http://www.transbank.cl" target="_blank"><img src="https://www.transbank.cl/public/img/Logo_Webpay3-01-50x50.png" alt="WebPay" title="WebPay" style="border: 1px solid #EEEEEE;" /></a>';
 $_['text_authorization'] = 'Autorizaci&oacute;n';
 $_['text_sale'] = 'Oferta';
 $_['text_options'] = 'Informaci&oacute;n';
