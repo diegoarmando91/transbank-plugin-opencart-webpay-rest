@@ -2,5 +2,5 @@
 /.idea
 .idea
 .vscode/
-src/upload/system/library/transbank-sdk-php
+src/upload/system/library/transbank/vendor/
 plugin-transbank-webpay-**.zip

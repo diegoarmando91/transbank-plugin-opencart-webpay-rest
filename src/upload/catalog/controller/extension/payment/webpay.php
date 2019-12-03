@@ -1,4 +1,7 @@
 <?php
+
+use Transbank\Webpay\WebpayPlus\TransactionCommitResponse;
+
 require_once(DIR_SYSTEM . 'library/TransbankSdkWebpay.php');
 require_once('libwebpay/LogHandler.php');
 
@@ -21,8 +24,7 @@ class ControllerExtensionPaymentWebpay extends Controller {
         $config = array(
             "ECOMMERCE" => "opencart",
             "MODO" => $this->config->get('payment_webpay_test_mode'),
-            "PRIVATE_KEY" => $this->config->get('payment_webpay_private_key'),
-            "PUBLIC_CERT" => $this->config->get('payment_webpay_public_cert'),
+            "API_KEY" => $this->config->get('payment_webpay_api_key'),
             "COMMERCE_CODE" => $this->config->get('payment_webpay_commerce_code'),
             "VENTA_DESC" => array(
                 "VD" => "Venta Deb&iacute;to",
@@ -62,7 +64,7 @@ class ControllerExtensionPaymentWebpay extends Controller {
         $returnUrl = $url;
         $finalUrl = $url;
 
-        $result = $transbankSdk->initTransaction($amount, $sessionId, $orderId, $returnUrl, $finalUrl);
+        $result = $transbankSdk->initTransaction($amount, $sessionId, $orderId, $returnUrl);
 
         $data['url'] = $result['url'];
         $data['token_ws'] = $result['token_ws'];
@@ -84,7 +86,22 @@ class ControllerExtensionPaymentWebpay extends Controller {
         if (($this->request->server['REQUEST_METHOD'] == 'POST')) {
             $tokenWs = isset($this->request->post['token_ws']) ? $this->request->post['token_ws'] : null;
         }
-
+        
+        if (isset($_POST['TBK_ID_SESION'])) {
+            $comment = array(
+                'error' => 'Compra cancelada',
+                'detail' => 'La compra ha sido cancelada por el usuario durante el proceso de pago'
+            );
+    
+            $orderStatusId = $this->config->get('payment_webpay_canceled_order_status');
+            $orderComment = 'Pago cancelado: ' . json_encode($comment);
+            $orderNotifyToUser = false;
+    
+            $this->model_checkout_order->addOrderHistory($orderId, $orderStatusId, $orderComment, $orderNotifyToUser);
+    
+            $this->failView();
+            return;
+        }
         if (!isset($tokenWs)) {
 
             $comment = array(
@@ -139,18 +156,19 @@ class ControllerExtensionPaymentWebpay extends Controller {
             $result = $transbankSdk->commitTransaction($tokenWs);
 
             $this->session->data['result'] = $result;
-
-            if (isset($result->buyOrder) && isset($result->detailOutput) && $result->detailOutput->responseCode == 0) {
+            
+            if (isset($result->buyOrder) && $result->getResponseCode() == 0) {
 
                 $this->session->data['paymentOk'] = 'SUCCESS';
 
                 $comment = array(
-                    'buyOrder' => $result->buyOrder,
-                    'sessionId' => $result->sessionId,
-                    'responseCode' => $result->detailOutput->responseCode,
-                    'authorizationCode' => $result->detailOutput->authorizationCode,
-                    'paymentTypeCode' => $result->detailOutput->paymentTypeCode,
-                    'vci' => $result->VCI
+                    'buyOrder' => $result->getBuyOrder(),
+                    'sessionId' => $result->getSessionId(),
+                    'responseCode' => $result->getResponseCode(),
+                    'authorizationCode' => $result->getAuthorizationCode(),
+                    'paymentTypeCode' => $result->getPaymentTypeCode(),
+                    'installmentsNumber' => $result->getInstallmentsNumber(),
+                    'vci' => $result->getVci()
                 );
 
                 $orderStatusId = $this->config->get('payment_webpay_completed_order_status');
@@ -159,22 +177,21 @@ class ControllerExtensionPaymentWebpay extends Controller {
 
                 $this->model_checkout_order->addOrderHistory($orderId, $orderStatusId, $orderComment, $orderNotifyToUser);
 
-                $this->toRedirect($result->urlRedirection, array('token_ws' => $tokenWs));
-                die();
+                $this->successView();
+                exit;
 
             } else {
 
                 $this->session->data['paymentOk'] = 'FAIL';
 
                 $comment = $result;
-
                 //check if was return from webpay, then use only subset data
                 if (isset($result->buyOrder)) {
                     $comment = array(
-                        'buyOrder' => $result->buyOrder,
-                        'sessionId' => $result->sessionId,
-                        'responseCode' => $result->detailOutput->responseCode,
-                        'responseDescription' => $result->detailOutput->responseDescription
+                        'buyOrder' => $result->getBuyOrder(),
+                        'sessionId' => $result->getSessionId(),
+                        'responseCode' => $result->getResponseCode(),
+                        'responseDescription' => ''
                     );
                 }
 
@@ -187,7 +204,7 @@ class ControllerExtensionPaymentWebpay extends Controller {
                 $rejectText = '';
 
                 if (isset($result->buyOrder)) {
-                    $rejectText = htmlentities($result->detailOutput->responseDescription);
+                    $rejectText = htmlentities('');
                 } else {
                     $rejectText = $result['error'] . ', ' . $result['detail'];
                 }
@@ -251,23 +268,34 @@ class ControllerExtensionPaymentWebpay extends Controller {
     private function successView() {
 
         $result = $this->session->data['result'];
-
-        if (!is_array($result)) {
+        if ($result instanceof stdClass) {
             $result = json_decode(json_encode($result));
         }
-
+        if ($result instanceof TransactionCommitResponse) {
+            $result = [
+                'paymentTypeCode' => $result->getPaymentTypeCode(),
+                'amount' => $result->getAmount(),
+                'transactionDate' => $result->getTransactionDate(),
+                'cardDetail' => $result->getCardDetail(),
+                'buyOrder' => $result->getBuyOrder(),
+                'vci' => $result->getVci(),
+                'response_code' => $result->getResponseCode(),
+                'authorizationCode' => $result->getAuthorizationCode(),
+                'installmentsNumber' => $result->getInstallmentsNumber()
+            ];
+        }
         $this->loadResources();
 
         $config = $this->getConfig();
 
-        if($result['detailOutput']['paymentTypeCode'] == "SI" || $result['detailOutput']['paymentTypeCode'] == "S2" ||
-            $result['detailOutput']['paymentTypeCode'] == "NC" || $result['detailOutput']['paymentTypeCode'] == "VC" ) {
-            $installmentType = $config['VENTA_DESC'][$result['detailOutput']['paymentTypeCode']];
+        if($result['paymentTypeCode'] == "SI" || $result['paymentTypeCode'] == "S2" ||
+            $result['paymentTypeCode'] == "NC" || $result['paymentTypeCode'] == "VC" ) {
+            $installmentType = $config['VENTA_DESC'][$result['paymentTypeCode']];
         } else {
             $installmentType = "Sin cuotas";
         }
 
-        if($result['detailOutput']['paymentTypeCode'] == "VD"){
+        if($result['paymentTypeCode'] == "VD"){
             $paymentType = "Débito";
         } else {
             $paymentType = "Crédito";
@@ -281,16 +309,15 @@ class ControllerExtensionPaymentWebpay extends Controller {
 
         $data['tbk_respuesta'] = "Aceptado";
         $data['tbk_orden_compra'] = $result['buyOrder'];
-        $data['tbk_codigo_autorizacion'] = $result['detailOutput']['authorizationCode'];
+        $data['tbk_codigo_autorizacion'] = $result['authorizationCode'];
         $datetime = new DateTime($result['transactionDate']);
         $data['tbk_hora_transaccion'] = $datetime->format('H:i:s');
         $data['tbk_dia_transaccion'] = $datetime->format('d-m-Y');
-        $data['tbk_final_numero_tarjeta'] = '************' . $result['cardDetail']['cardNumber'];
+        $data['tbk_final_numero_tarjeta'] = '**** **** **** ' . $result['cardDetail']['card_number'];
         $data['tbk_tipo_pago'] = $paymentType;
         $data['tbk_tipo_cuotas'] = $installmentType;
-        $data['tbk_monto'] = $result['detailOutput']['amount'];
-        $data['tbk_numero_cuotas'] = $result['detailOutput']['sharesNumber'];
-
+        $data['tbk_monto'] = $result['amount'];
+        $data['tbk_numero_cuotas'] = $result['installmentsNumber'];
         $this->session->data['transbank_webpay_result'] = $this->load->view('extension/payment/webpay_success', $data);
         $this->response->redirect($this->url->link('checkout/success', 'language=' . $this->config->get('config_language'), 'SSL'));
     }

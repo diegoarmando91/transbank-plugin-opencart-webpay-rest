@@ -216,7 +216,8 @@ class LogHandler {
     }
 
     private function setLogCount() {
-        $count = count($this->setLogList());
+        $logList = $this->setLogList();
+        $count = isset($logList) ? count($logList) : 0;
         $result = array('log_count' => $count);
         return $result;
     }

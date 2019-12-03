@@ -1,7 +1,7 @@
 <?php
 
 // Heading
-$_['heading_title'] = 'Webpay Plus';
+$_['heading_title'] = 'Webpay Plus REST';
 
 // Text
 $_['text_extension'] = 'Extensions';
@@ -15,9 +15,8 @@ $_['text_enabled'] = 'Habilitado';
 $_['text_disabled'] = 'Deshabilitado';
 $_['text_all_zones'] = 'Todas las &Aacute;reas';
 // entry menu
-$_['entry_commerce_code'] = 'C&oacute;digo de Comercio:';
-$_['entry_private_key'] = 'Llave Privada';
-$_['entry_public_cert'] = 'Certificado:';
+$_['entry_commerce_code'] = 'C&oacute;digo de comercio:';
+$_['entry_api_key'] = 'API Key:';
 $_['entry_test_mode'] = 'Ambiente a utilizar:';
 
 $_['tab_settings'] = 'Ajustes';
@@ -36,24 +35,20 @@ $_['entry_canceled_order_status']  = 'Estado cancelado:';
 
 // placeholder
 $_['webpay_commerce_code_placeholder'] = 'C&oacute;digo del comercio';
-$_['webpay_private_key_placeholder'] = 'Llave Privada';
-$_['webpay_public_cert_placeholder'] = 'Certificado P&uacute;blico';
-$_['webpay_total_placeholder'] = 'Monto minimo';
+$_['webpay_api_key_placeholder'] = 'API Key';
+$_['webpay_total_placeholder'] = 'Monto m&iacute;nimo';
 $_['webpay_sort_order_placeholder'] = 'Orden';
 
 // Help
 $_['help_commerce_code'] = 'C&oacute;digo de comercio &uacute;nico entregado por Transbank';
-$_['help_private_key'] = 'Llave privada SSL del Servidor';
-$_['help_public_cert'] = 'Certificado Publico del Servidor';
+$_['help_api_key'] = 'Llave que te entregar&aacute; Transbank para autenticar la comunicaci&oacute;n.';
 $_['help_test_mode'] = 'Ambiente de Integraci&oacute;n o Producci&oacute;n de para realizar Transacciones';
 $_['help_total'] = 'Cantidad minima para activar este medio de pago';
 
 // Error
 $_['error_permission'] = 'Advertencia: ¡No tienes permiso para modificar el motor de pago Webpay!';
 $_['error_commerce_code'] = '¡Se requiere el c&oacute;digo de comercio!';
-$_['error_private_key'] = '¡Se requiere la llave privada!';
-$_['error_public_cert'] = '¡Se requiere el certificado!';
-
+$_['error_api_key'] = '¡Se requiere el API Key!';
 
 // modal-content
 

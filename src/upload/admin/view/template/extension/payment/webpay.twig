@@ -54,7 +54,7 @@
 
                     <div class="form-group required">
                         <label class="col-sm-2 control-label" for="payment_webpay_test_mode">
-                            <span data-toggle="tooltip" title="{{ help_test_mode }}"></span>{{ entry_test_mode }}
+                            <span data-toggle="tooltip" title="{{ help_test_mode }}"></span> {{ entry_test_mode }}
                         </label>
                         <div class="col-sm-5">
                             <select class="form-control" name="payment_webpay_test_mode" id="payment_webpay_test_mode">
@@ -69,40 +69,35 @@
                         </div>
                     </div>
 
+                    {# Commerce Code #}
                     <div class="form-group required">
                         <label class="col-sm-2 control-label" for="payment_webpay_commerce_code">
                             <span data-toggle="tooltip" title="{{ help_commerce_code }}"></span> {{entry_commerce_code}}
                         </label>
                         <div class="col-sm-5">
                             <input type="text" name="payment_webpay_commerce_code"
-                            placeholder="{{ webpay_commerce_code_placeholder }}"
-                            id="payment_webpay_commerce_code"
-                            value="{{ payment_webpay_commerce_code }}"class="form-control" style="font-family:monospace;"></input>
+                                   placeholder="{{ webpay_commerce_code_placeholder }}"
+                                   id="payment_webpay_commerce_code"
+                                   value="{{ payment_webpay_commerce_code }}" class="form-control"
+                                   style="font-family:monospace;"/>
                             {% if error_commerce_code %}
-                            <div class="text-danger">{{ error_commerce_code }}</div>
+                                <div class="text-danger">{{ error_commerce_code }}</div>
                             {% endif %}
                         </div>
                     </div>
-
+                    {# API Key #}
                     <div class="form-group required">
-                        <label class="col-sm-2 control-label" for="payment_webpay_private_key">
-                            <span data-toggle="tooltip" title="{{ help_private_key }}"></span> {{ entry_private_key }}
+                        <label class="col-sm-2 control-label" for="payment_webpay_commerce_code">
+                            <span data-toggle="tooltip" title="{{ help_api_key }}"></span> {{entry_api_key}}
                         </label>
                         <div class="col-sm-5">
-                            <textarea name="payment_webpay_private_key" placeholder="{{ webpay_private_key_placeholder }}" id="payment_webpay_private_key" class="form-control">{{ payment_webpay_private_key }}</textarea>
-                            {% if error_private_key %}
-                            <div class="text-danger">{{ error_private_key }}</div>
-                            {% endif %}
-                        </div>
-                    </div>
-
-                    <div class="form-group required">
-                        <label class="col-sm-2 control-label" for="payment_webpay_public_cert">
-                            <span data-toggle="tooltip" title="{{ help_public_cert }}"></span> {{ entry_public_cert }}</label>
-                        <div class="col-sm-5">
-                            <textarea name="payment_webpay_public_cert" placeholder="{{ webpay_public_cert_placeholder }}" id="payment_webpay_public_cert" class="form-control" style="font-family:monospace;">{{ payment_webpay_public_cert }}</textarea>
-                            {% if error_public_cert %}
-                            <div class="text-danger">{{ error_public_cert }}</div>
+                            <input type="text" name="payment_webpay_api_key"
+                                   placeholder="{{ webpay_api_key_placeholder }}"
+                                   id="payment_webpay_api_key"
+                                   value="{{ payment_webpay_api_key }}" class="form-control"
+                                   style="font-family:monospace;"/>
+                            {% if error_api_key %}
+                                <div class="text-danger">{{ error_api_key }}</div>
                             {% endif %}
                         </div>
                     </div>
@@ -255,69 +250,7 @@
                             <td>{{ healthcheck.server_resume.plugin_info.last_plugin_version }}</td>
                         </tr>
                     </table>
-                    <h3 class="menu-head">Validaci&oacute;n de Certificados</h3>
-                    <table class="table table-borderless">
-                        <tr>
-                            <td>
-                                <span class="label label-info" title="{{ label_consistency }}">
-                                <b>{{ l_consistency }}</b>
-                                </span>
-                            </td>
-                            <td>{{ _self.class_response(healthcheck.validate_certificates.consistency.cert_vs_private_key)}}</td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <span class="label label-info" title="{{ label_commerce_code_validate }}">
-                                    <b>{{ l_cc_validate }}</b>
-                                </span>
-                            </td>
-                            <td>{{ _self.class_response(healthcheck.validate_certificates.consistency.commerce_code_validate)}}</td>
-                        </tr>
-                    </table>
                     <hr>
-                    <h4>Informaci&oacute;n Certificado</h4>
-                    <table class="table table-borderless">
-                        <tr>
-                            <td>
-                                <span class="label label-info" title="{{ label_common_name }}">
-                                    <b>{{ l_cn }}</b>
-                                </span>
-                            </td>
-                            <td>{{ healthcheck.validate_certificates.cert_info.subject_commerce_code}}</td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <span class="label label-info" title="{{ label_cert_version }}">
-                                    <b>{{ l_cert_version}}</b>
-                                </span>
-                            </td>
-                            <td>{{ healthcheck.validate_certificates.cert_info.version }}</td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <span class="label label-info" title="{{ label_cert_vigency }}">
-                                    <b>{{ l_cert_vigency }}</b>
-                                </span>
-                            </td>
-                            <td>{{ _self.class_response(healthcheck.validate_certificates.cert_info.is_valid)}}</td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <span class="label label-info" title="{{ label_cert_from}}">
-                                    <b>{{ l_cert_from}}</b>
-                                </span>
-                            </td>
-                            <td>{{ healthcheck.validate_certificates.cert_info.valid_from }}</td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <span class="label label-info" title="{{ label_cert_to }}">
-                                    <b>{{ l_cert_to }}</b>
-                                </span>
-                            </td>
-                            <td>{{ healthcheck.validate_certificates.cert_info.valid_to }}</td>
-                        </tr>
-                    </table>
 
                     <h3 class="menu-head">Informaci&oacute;n de Servidor</h3>
                     <h4>Informaci&oacute;n Principal</h4>

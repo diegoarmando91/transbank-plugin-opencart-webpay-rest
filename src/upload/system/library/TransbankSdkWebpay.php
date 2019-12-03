@@ -1,74 +1,75 @@
 <?php
-
-require_once('transbank-sdk-php/init.php');
+require_once('transbank/vendor/autoload.php');
 
 use Transbank\Webpay\Configuration;
 use Transbank\Webpay\Webpay;
+use Transbank\Webpay\WebpayPlus\Transaction;
 
-class TransbankSdkWebpay {
-
-    const PLUGIN_VERSION = '2.1.4'; //version of plugin payment
-
-    var $transaction;
-
-    function __construct($config = null, $log = null) {
+class TransbankSdkWebpay
+{
+    
+    const PLUGIN_VERSION = '1.0.0'; //version of plugin payment
+    
+    function __construct($config = null, $log = null)
+    {
         $this->log = $log;
         if (isset($config)) {
             $environment = isset($config["MODO"]) ? $config["MODO"] : 'INTEGRACION';
-            $configuration = Configuration::forTestingWebpayPlusNormal();
             if ($environment != "INTEGRACION") {
-                $configuration->setEnvironment($environment);
-                $configuration->setWebpayCert(Webpay::defaultCert($environment));
-                $configuration->setCommerceCode($config["COMMERCE_CODE"]);
-                $configuration->setPrivateKey($config["PRIVATE_KEY"]);
-                $configuration->setPublicCert($config["PUBLIC_CERT"]);
+                WebpayPlus::setApiKey($config['API_KEY']);
+                WebpayPlus::setCommerceCode($config['COMMERCE_CODE']);
+                WebpayPlus::setIntegrationType($environment);
             }
-            $this->transaction = (new Webpay($configuration))->getNormalTransaction();
         }
     }
-
-    public function initTransaction($amount, $sessionId, $buyOrder, $returnUrl, $finalUrl) {
-        $result = array();
-		try{
+    
+    public function initTransaction($amount, $sessionId, $buyOrder, $returnUrl)
+    {
+        $result = [];
+        try {
             $txDate = date('d-m-Y');
             $txTime = date('H:i:s');
-            $this->log->logInfo('initTransaction - amount: ' . $amount . ', sessionId: ' . $sessionId .
-                                ', buyOrder: ' . $buyOrder . ', txDate: ' . $txDate . ', txTime: ' . $txTime);
-            $initResult = $this->transaction->initTransaction($amount, $buyOrder, $sessionId, $returnUrl, $finalUrl);
-            $this->log->logInfo('initTransaction - initResult: ' . json_encode($initResult));
-            if (isset($initResult) && isset($initResult->url) && isset($initResult->token)) {
-                $result = array(
-					"url" => $initResult->url,
-					"token_ws" => $initResult->token
-				);
+            $this->log->logInfo('initTransaction - amount: ' . $amount . ', sessionId: ' . $sessionId . ', buyOrder: ' . $buyOrder . ', txDate: ' . $txDate . ', txTime: ' . $txTime);
+            
+            $response = Transaction::create($buyOrder, $sessionId, $amount, $returnUrl);
+            $this->log->logInfo('initTransaction - initResult: ' . json_encode($response));
+            if (isset($response) && isset($response->url) && isset($response->token)) {
+                $result = [
+                    "url" => $response->url,
+                    "token_ws" => $response->token
+                ];
             } else {
                 throw new \Exception('No se ha creado la transacción para, amount: ' . $amount . ', sessionId: ' . $sessionId . ', buyOrder: ' . $buyOrder);
             }
-		} catch(\Exception $e) {
-            $result = array(
+        } catch (\Exception $e) {
+            $result = [
                 "error" => 'Error al crear la transacción',
                 "detail" => $e->getMessage()
-            );
+            ];
             $this->log->logError(json_encode($result));
-		}
-		return $result;
+        }
+        
+        return $result;
     }
-
-    public function commitTransaction($tokenWs) {
-        $result = array();
-        try{
+    
+    public function commitTransaction($tokenWs)
+    {
+        $result = [];
+        try {
             $this->log->logInfo('getTransactionResult - tokenWs: ' . $tokenWs);
             if ($tokenWs == null) {
                 throw new \Exception("El token webpay es requerido");
             }
-            return $this->transaction->getTransactionResult($tokenWs);
-        } catch(\Exception $e) {
-            $result = array(
+    
+            return Transaction::commit($tokenWs);
+        } catch (\Exception $e) {
+            $result = [
                 "error" => 'Error al confirmar la transacción',
                 "detail" => $e->getMessage()
-            );
+            ];
             $this->log->logError(json_encode($result));
         }
+        
         return $result;
     }
 }
