@@ -62,7 +62,6 @@ class ControllerExtensionPaymentWebpay extends Controller {
         $url = $this->url->link('extension/payment/webpay/callback', '', 'SSL');
         $url .= (parse_url($url, PHP_URL_QUERY) ? '&' : '?') . ('ph_=' . $paymentHash);
         $returnUrl = $url;
-        $finalUrl = $url;
 
         $result = $transbankSdk->initTransaction($amount, $sessionId, $orderId, $returnUrl);
 
@@ -98,7 +97,9 @@ class ControllerExtensionPaymentWebpay extends Controller {
             $orderNotifyToUser = false;
     
             $this->model_checkout_order->addOrderHistory($orderId, $orderStatusId, $orderComment, $orderNotifyToUser);
-    
+            $this->session->data['reject_text'] = 'Pago cancelado por el usuario';
+            $this->session->data['reject_date'] = date('d-m-Y');
+            $this->session->data['reject_time'] = date('H:i:s');
             $this->failView();
             return;
         }
