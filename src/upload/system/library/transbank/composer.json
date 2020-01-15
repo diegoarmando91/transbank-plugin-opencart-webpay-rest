@@ -1,0 +1,5 @@
+{
+    "require": {
+        "transbank/transbank-sdk": "dev-feat/add-rest-support"
+    }
+}

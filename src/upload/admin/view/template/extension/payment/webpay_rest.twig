@@ -1,0 +1,567 @@
+{{ header }}{{ column_left }}
+<div id="content">
+    <div class="page-header">
+        <div class="container-fluid">
+            <div class="pull-right">
+                <button type="submit" name="form-webpay_rest" data-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary">
+                    <i class="fa fa-save"></i>
+                </button>
+                <a href="{{ cancel }}" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-default">
+                    <i class="fa fa-reply"></i>
+                </a>
+            </div>
+            <h1>{{ heading_title }}</h1>
+            <ul class="breadcrumb">
+                {% for breadcrumb in breadcrumbs %}
+                <li>
+                    <a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    <div class="container-fluid">
+        {% if error_warning %}
+        <div class="alert alert-danger alert-dismissible">
+            <i class="fa fa-exclamation-circle"></i> {{ error_warning }}
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+        </div>
+        {% endif %}
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">
+                    <i class="fa fa-pencil"></i>{{ text_edit }}
+                </h3>
+                <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#tb_commerce_mod_info" name="button">{{ text_options }}</button>
+            </div>
+            <div class="panel-body">
+                <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-webpay_rest" class="form-horizontal">
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="payment_webpay_rest_status">{{ entry_status }}</label>
+                        <div class="col-sm-5">
+                            <select name="payment_webpay_rest_status" id="payment_webpay_rest_status" class="form-control">
+                                {% if payment_webpay_rest_status %}
+                                <option value="1" selected="selected">{{ text_enabled }}</option>
+                                <option value="0">{{ text_disabled }}</option>
+                                {% else %}
+                                <option value="1">{{ text_enabled }}</option>
+                                <option value="0" selected="selected">{{ text_disabled }}</option>
+                                {% endif %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group required">
+                        <label class="col-sm-2 control-label" for="payment_webpay_rest_test_mode">
+                            <span data-toggle="tooltip" title="{{ help_test_mode }}"></span> {{ entry_test_mode }}
+                        </label>
+                        <div class="col-sm-5">
+                            <select class="form-control" name="payment_webpay_rest_test_mode" id="payment_webpay_rest_test_mode">
+                                {% if payment_webpay_rest_test_mode == 'PRODUCCION' %}
+                                <option value="INTEGRACION">INTEGRACION</option>
+                                <option value="PRODUCCION" selected="selected">PRODUCCION</option>
+                                {% else %}
+                                <option value="INTEGRACION" selected="selected">INTEGRACION</option>
+                                <option value="PRODUCCION">PRODUCCION</option>
+                                {% endif %}
+                            </select>
+                        </div>
+                    </div>
+
+                    {# Commerce Code #}
+                    <div class="form-group required">
+                        <label class="col-sm-2 control-label" for="payment_webpay_rest_commerce_code">
+                            <span data-toggle="tooltip" title="{{ help_commerce_code }}"></span> {{entry_commerce_code}}
+                        </label>
+                        <div class="col-sm-5">
+                            <input type="text" name="payment_webpay_rest_commerce_code"
+                                   placeholder="{{ webpay_rest_commerce_code_placeholder }}"
+                                   id="payment_webpay_rest_commerce_code"
+                                   value="{{ payment_webpay_rest_commerce_code }}" class="form-control"
+                                   style="font-family:monospace;"/>
+                            {% if error_commerce_code %}
+                                <div class="text-danger">{{ error_commerce_code }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {# API Key #}
+                    <div class="form-group required">
+                        <label class="col-sm-2 control-label" for="payment_webpay_rest_commerce_code">
+                            <span data-toggle="tooltip" title="{{ help_api_key }}"></span> {{entry_api_key}}
+                        </label>
+                        <div class="col-sm-5">
+                            <input type="text" name="payment_webpay_rest_api_key"
+                                   placeholder="{{ webpay_rest_api_key_placeholder }}"
+                                   id="payment_webpay_rest_api_key"
+                                   value="{{ payment_webpay_rest_api_key }}" class="form-control"
+                                   style="font-family:monospace;"/>
+                            {% if error_api_key %}
+                                <div class="text-danger">{{ error_api_key }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="payment_webpay_rest_completed_order_status">{{ entry_completed_order_status }}</label>
+                        <div class="col-sm-5">
+                            <select name="payment_webpay_rest_completed_order_status" id="payment_webpay_rest_completed_order_status" class="form-control">
+                                {% for order_status in order_statuses %} {% if order_status.order_status_id == payment_webpay_rest_completed_order_status %}
+                                <option value="{{ order_status.order_status_id }}" selected="selected">{{ order_status.name }}</option>
+                                {% else %}
+                                <option value="{{ order_status.order_status_id }}">{{ order_status.name }}</option>
+                                {% endif %} {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="payment_webpay_rest_rejected_order_status">{{ entry_rejected_order_status }}</label>
+                        <div class="col-sm-5">
+                            <select name="payment_webpay_rest_rejected_order_status" id="payment_webpay_rest_rejected_order_status" class="form-control">
+                                {% for order_status in order_statuses %} {% if order_status.order_status_id == payment_webpay_rest_rejected_order_status %}
+                                <option value="{{ order_status.order_status_id }}" selected="selected">{{ order_status.name }}</option>
+                                {% else %}
+                                <option value="{{ order_status.order_status_id }}">{{ order_status.name }}</option>
+                                {% endif %} {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="payment_webpay_rest_canceled_order_status">{{ entry_canceled_order_status }}</label>
+                        <div class="col-sm-5">
+                            <select name="payment_webpay_rest_canceled_order_status" id="payment_webpay_rest_canceled_order_status" class="form-control">
+                                {% for order_status in order_statuses %} {% if order_status.order_status_id == payment_webpay_rest_canceled_order_status %}
+                                <option value="{{ order_status.order_status_id }}" selected="selected">{{ order_status.name }}</option>
+                                {% else %}
+                                <option value="{{ order_status.order_status_id }}">{{ order_status.name }}</option>
+                                {% endif %} {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="payment_webpay_rest_sort_order">{{ entry_sort_order }}</label>
+                        <div class="col-sm-5">
+                            <input type="text" name="payment_webpay_rest_sort_order" value="{{ payment_webpay_rest_sort_order }}" placeholder="{{ entry_sort_order }}" id="payment_webpay_rest_sort_order" class="form-control" />
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{{ footer }}
+
+<style media="screen">
+
+    H3.menu-head {
+        background-color: #d6012f;
+        color: #ffffff;
+    }
+
+    .invisible {
+        visibility: hidden;
+    }
+
+    .modal-content {
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        font-size: 13px;
+        line-height: 18px;
+        color: #333;
+    }
+
+    .table-borderless > tbody > tr > td,
+    .table-borderless > tbody > tr > th,
+    .table-borderless > tfoot > tr > td,
+    .table-borderless > tfoot > tr > th,
+    .table-borderless > thead > tr > td,
+    .table-borderless > thead > tr > th {
+        border: none;
+    }
+</style>
+
+{% macro class_response(string) %} {% if string == 'OK' %}
+<span class='label label-success'>OK</span> {% elseif string == null %}
+<span class='label label-warning'>Vac&iacute;o</span> {% else %}
+<span class='label label-danger'>{{ string }}</span> {% endif %} {% endmacro %}
+
+<!-- Modal con la informacion para desplegar -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/3.3.4/css/bootstrap3/bootstrap-switch.min.css">
+<div class="modal fade" id="tb_commerce_mod_info" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="">
+                    <ul class="nav nav-tabs">
+                        <li class="active">
+                            <a href="#tb_main_info" data-toggle="tab" class="tabInfo">Informacion</a>
+                        </li>
+                        <li>
+                            <a href="#tb_php_info" data-toggle="tab" class="tabInfo">PHP info</a>
+                        </li>
+                        <li>
+                            <a href="#tb_logs" data-toggle="tab" class="tabInfo">Registros</a>
+                        </li>
+                    </ul>
+                </h4>
+            </div>
+            <div class="modal-body">
+                <div class="tab-pane fade active in" id="tb_main_info">
+                    <h3 class="menu-head">Informaci&oacute;n Plugin / Ambiente</h3>
+                    <table class="table table-borderless">
+                        <tr>
+                            <td>
+                                <span class="label label-info" title="{{ label_ecommerce_name }}">
+                                    <b>{{ l_ecommerce }}</b>
+                                </span>
+                            </td>
+                            <td>
+                                <input type="hidden" name="tb_ecommece" id="tb_ecommerce" value="{{ healthcheck.server_resume.plugin_info.ecommerce }}"> {{ healthcheck.server_resume.plugin_info.ecommerce }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <span class="label label-info" title="{{ label_ecommerce_version }}">
+                                    <b>{{ l_version }}</b>
+                                </span>
+                            </td>
+                            <td>
+                                {{ healthcheck.server_resume.plugin_info.ecommerce_version }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <span class="label label-info" title="{{ label_ecommerce_webpay }}">
+                                    <b>{{ l_webpay }}</b>
+                                </span>
+                            </td>
+                            <td>{{ healthcheck.server_resume.plugin_info.current_plugin_version }}</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <span class="label label-info" title="{{ label_ecommerce_last }}">
+                                    <b>{{ l_last_webpay }}</b>
+                                </span>
+                            </td>
+                            <td>{{ healthcheck.server_resume.plugin_info.last_plugin_version }}</td>
+                        </tr>
+                    </table>
+                    <hr>
+
+                    <h3 class="menu-head">Informaci&oacute;n de Servidor</h3>
+                    <h4>Informaci&oacute;n Principal</h4>
+                    <table class="table table-borderless">
+                        <tr>
+                            <td>
+                                <span class="label label-info" title="{{ label_webserver }}">
+                                    <b>{{ l_webserver }}</b>
+                                </span>
+                            </td>
+                            <td>{{ healthcheck.server_resume.server_version.server_software }}</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <h4>PHP</h4>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <span class="label label-info" title="{{ label_php_version_validate}}">
+                                    <b>{{ l_php_validate}}</b>
+                                </span>
+                            </td>
+                            <td>{{ _self.class_response(healthcheck.server_resume.php_version.status)}}</td>
+                        </tr>
+                        <td>
+                            <span class="label label-info" title="{{ label_php_version }}">
+                                <b>{{ l_php_version }}</b>
+                            </span>
+                        </td>
+                        <td>{{ healthcheck.server_resume.php_version.version }}</td>
+                    </table>
+                    <hr>
+                    <table class="table table-responsive table-striped">
+                        <thead>
+                            <th>Extension</th>
+                            <th>Estado</th>
+                            <th>Version</th>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <th>OpenSSL</th>
+                                <td>{{ _self.class_response(healthcheck.php_extensions_status.openssl.status) }}</td>
+                                <td>{{ healthcheck.php_extensions_status.openssl.version }}</td>
+                            </tr>
+                            <tr>
+                                <th>SimpleXML</th>
+                                <td>{{ _self.class_response(healthcheck.php_extensions_status.SimpleXML.status) }}</td>
+                                <td>{{ healthcheck.php_extensions_status.SimpleXML.version }}</td>
+                            </tr>
+                            <tr>
+                                <th>soap</th>
+                                <td>{{ _self.class_response(healthcheck.php_extensions_status.soap.status) }}</td>
+                                <td>{{ healthcheck.php_extensions_status.soap.version }}</td>
+                            </tr>
+                            <tr>
+                                <th>dom</th>
+                                <td>{{ _self.class_response(healthcheck.php_extensions_status.dom.status) }}</td>
+                                <td>{{ healthcheck.php_extensions_status.dom.version }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3 class="menu-head">Validaci&oacute;n Transacci&oacute;n</h3>
+                    <h4>Petici&oacute;n a Transbank</h4>
+                    <table class="table table-striped">
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <button class="check_conn btn btn-sm btn-primary">Verificar Conexión</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <hr>
+                    <h4>Respuesta de Transbank</h4>
+                    <table class="table table-borderless">
+                        <tbody>
+                            <tr id="row_response_status" style="display:none">
+                                <td>
+                                    <div title="Informa el estado de la comunicación con Transbank mediante método init_transaction" class="label label-info">?</div> <strong>Estado: </strong>
+                                </td>
+                                <td>
+                                    <span id="row_response_status_text" class="label tbk_table_trans" style="display:none"></span>
+                                </td>
+                            </tr>
+                            <tr id="row_response_url" style="display:none">
+                                <td>
+                                    <div title="URL entregada por Transbank para realizar la transacción" class="label label-info">?</div> <strong>URL: </strong>
+                                </td>
+                                <td id="row_response_url_text" class="tbk_table_trans"></td>
+                            </tr>
+                            <tr id="row_response_token" style="display:none">
+                                <td>
+                                    <div title="Token entregada por Transbank para realizar la transacción" class="label label-info">?</div> <strong>Token: </strong>
+                                </td>
+                                <td id="row_response_token_text" class="tbk_table_trans"></td>
+                            </tr>
+                            <tr id="row_error_message" style="display:none">
+                                <td>
+                                    <div title="Mensaje de error devuelto por Transbank al fallar init_transaction" class="label label-info">?</div> <strong>Error: </strong>
+                                </td>
+                                <td id="row_error_message_text" class="tbk_table_trans"></td>
+                            </tr>
+                            <tr id="row_error_detail" style="display:none">
+                                <td>
+                                    <div title="Detalle del error devuelto por Transbank al fallar init_transaction" class="label label-info">?</div> <strong>Detalle: </strong>
+                                </td>
+                                <td id="row_error_detail_text" class="tbk_table_trans"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="tab-pane fade" id="tb_php_info">
+                    {{ healthcheck.php_info.string.content }}
+                </div>
+                <div class="tab-pane fade" id="tb_logs">
+                    <div class="form_validate" style="display:none;">
+                        <h3 class="menu-head">Configuraci&oacute;n</h3>
+                        <table class="table table-borderless">
+                            <tr>
+                                <td>
+                                    <span class="label label-info" title="{{ label_active_logs }}">
+                                        <b>{{ l_logs_active }}</b>
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if loghandler.config.status == true %}
+                                    <input type='checkbox' name='tb_reg_checkbox' id='tb_reg_checkbox' checked> {% else %}
+                                    <input type='checkbox' name='tb_reg_checkbox' id='tb_reg_checkbox'> {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <span class="label label-info" title="{{ label_logs_days }}">
+                                        <b>{{ l_ldays }}</b>
+                                    </span>
+                                </td>
+                                <td>
+                                    <input type="number" name="tb_regs_days" id="tb_regs_days" value="{{ tb_max_logs_days }}" placeholder="1" maxlength="2" size="2" min="1" max="30">
+                                    <span>D&iacute;as</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <span class="label label-info" title="{{ label_logs_weight }}">
+                                        <b>{{ l_lweight }}</b>
+                                    </span>
+                                </td>
+                                <td>
+                                    <input type="number" name="tb_regs_weight" id="tb_regs_weight" value="{{ tb_max_logs_weight }}" placeholder="2" maxlength="2" size="2" min="1" max="10">
+                                    <span>Mb</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                {% if loghandler.config.status == true %}
+                                <td>
+                                    <button type="button" name="tb_update" id="tb_update" class="btn btn-info btn-sm">{{btn_params}}</button>
+                                </td>
+                                {% else %}
+                                <td>
+                                    <button type="button" name="tb_update" id="tb_update" class="btn btn-default btn-sm disabled">{{ btn_params }}</button>
+                                </td>
+                                {% endif %}
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="maininfo">
+                        <h3 class="menu-head">Informaci&oacute;n de Registros</h3>
+                        <table class="table table-borderless">
+                            <tr>
+                                <td>
+                                    <span class="label label-info" title="{{ label_regs_status }}">
+                                        <b>{{ l_regs_status }}</b>
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if loghandler.config.status == true %}
+                                    <span class='label label-success'>Activado sistema de Registros</span> {% else %}
+                                    <span class='label label-warning'>Desactivado sistema de Registros</span> {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <span class="label label-info" title="{{ label_regs_dir }}">
+                                        <b>{{ l_regs_dir }}</b>
+                                    </span>
+                                </td>
+                                <td>{{ log_dir }}</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <span class="label label-info" title="{{ label_regs_count }}">
+                                        <b>{{ l_regs_count }}</b>
+                                    </span>
+                                </td>
+                                <td>{{ log_count }}</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <span class="label label-info" title="{{ label_regs_list }}">
+                                        <b>{{ l_regs_list }}</b>
+                                    </span>
+                                </td>
+                                <td>
+                                    <ul>
+                                        {% for item in log_list %}
+                                        <li>{{ item }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </td>
+                            </tr>
+                        </table>
+                        <hr>
+                        <b>{{ l_last_log }}</b>
+                        <div class="log_content">
+                            <code>{{ res_logcontent }}</code>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a id="boton_pdf" class="btn btn-danger" href="{{ url_create_pdf_report }}" target="_blank">
+                    <i class="fa fa-file-pdf-o" aria-hidden="true"></i> {{ btn_pdfmain }}
+                </a>
+                <a id="boton_php_info" class="btn btn-warning" href="{{ url_create_pdf_php_info }}" target="_blank">
+                    <i class="fa fa-info-circle" aria-hidden="true"></i> {{ button_pdfinfo }}
+                </a>
+                <button type="button" class="btn btn-default" data-dismiss="modal">{{ btn_close }}</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Script para limpiar parametros -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/3.3.4/js/bootstrap-switch.min.js" charset="utf-8"></script>
+
+<script type="text/javascript">
+
+    $(document).ready(function() {
+
+        $('#tb_commerce_mod_info').on('show.bs.modal', function() {
+            $('.modal .modal-body').css('overflow-y', 'auto');
+            $('.modal .modal-body').css('max-height', $(window).height() * 0.7);
+        });
+
+        $('#tb_php_info').hide();
+        $('#tb_logs').hide();
+        $('#boton_php_info').hide();
+
+        $('.tabInfo').click(function(e) {
+            var target = $(this).attr("href");
+            if (target == '#tb_main_info') {
+                $('#boton_pdf').show();
+                $('#boton_php_info').hide();
+                $('#tb_main_info').show();
+                $('#tb_php_info').hide();
+                $('#tb_logs').hide();
+            } else {
+                $('#boton_pdf').hide();
+                if (target == '#tb_php_info') {
+                    $('#boton_php_info').show();
+                    $('#tb_main_info').hide();
+                    $('#tb_logs').hide();
+                    $('#tb_php_info').show();
+
+                } else {
+                    $('#tb_main_info').hide();
+                    $('#tb_logs').show();
+                    $('#tb_php_info').hide();
+                    $('#boton_php_info').hide();
+                }
+            }
+        });
+
+        $(".check_conn").click(function() {
+
+            $(".check_conn").text("Verificando ...");
+            $("#row_response_status").hide();
+            $("#row_response_url").hide();
+            $("#row_response_token").hide();
+            $("#row_error_message").hide();
+            $("#row_error_detail").hide();
+            $(".tbk_table_trans").empty();
+
+            $.post('{{ url_check_conn }}', {}, function(response){
+
+                $(".check_conn").text("Verificar Conexión");
+                $("#row_response_status").show();
+                $("#row_response_status_text").removeClass("label-success").removeClass("label-danger");
+
+                if(response.status.string == "OK") {
+
+                    $("#row_response_status_text").addClass("label-success").text("OK").show();
+                    $("#row_response_url_text").append(response.response.url);
+                    $("#row_response_token_text").append('<pre>'+response.response.token_ws+'</pre>');
+
+                    $("#row_response_url").show();
+                    $("#row_response_token").show();
+
+                } else {
+
+                    $("#row_response_status_text").addClass("label-danger").text("ERROR").show();
+                    $("#row_error_message_text").append(response.response.error);
+                    $("#row_error_detail_text").append('<pre>'+response.response.detail+'</pre>');
+
+                    $("#row_error_message").show();
+                    $("#row_error_detail").show();
+                }
+
+            },'json');
+        });
+    });
+</script>

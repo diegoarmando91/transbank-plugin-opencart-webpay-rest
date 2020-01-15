@@ -1,4 +1,4 @@
-# Manual de instalación para Plugin Opencart
+# Manual de instalación para Plugin Opencart con Webpay REST
 
 ## Descripción
 
@@ -9,9 +9,7 @@ Este plugin oficial ha sido creado para que puedas integrar Webpay fácilmente e
 Debes tener instalado previamente Opencart.
 
 Habilitar los siguientes módulos / extensiones para PHP:
-- Soap
 - OpenSSL 1.0.1 o superior
-- SimpleXML
 - DOM 2.7.8 o superior
 
 ## Instalación de Plugin
@@ -60,7 +58,7 @@ Este plugin posee un sitio de configuración que te permitirá ingresar credenci
 
 Para acceder a la configuración, debes seguir los siguientes pasos:
 
-1. Dirígete a la página de administración de Opencart (usualmente en _misitio.com_/admin), y luego dirígete a (Extensions / Extensions) , filtra por "Payments", busca "Webpay Plus" y presiona el botón "Edit" del plugin:
+1. Dirígete a la página de administración de Opencart (usualmente en _misitio.cl/admin_), y luego dirígete a (Extensions / Extensions) , filtra por "Payments", busca "Webpay Plus" y presiona el botón "Edit" del plugin:
 
   ![Paso 8](img/paso8.png)
 
@@ -69,9 +67,7 @@ Para acceder a la configuración, debes seguir los siguientes pasos:
   * **Estado**: Habilita o deshabilita el plugin, debes habilitarlo para que funcione como medio de pago en tu comercio.
   * **Ambiente**: Ambiente hacia donde se realiza la transacción. 
   * **Código de comercio**: Es lo que te identifica como comercio.
-  * **Llave Privada**: Llave secreta que te autoriza y valida a hacer transacciones.
-  * **Certificado**: Llave publica que te autoriza y valida a hacer transacciones.
-  * **Certificado Transbank**: Llave secreta de webpay que te autoriza y valida a hacer transacciones.
+  * **API Key**: Código secreto de webpay que te autoriza y valida a hacer transacciones.
 
   Las opciones disponibles para _Ambiente_ son: "Integración" para realizar pruebas y certificar la instalación con Transbank, y "Producción" para hacer transacciones reales una vez que Transbank ha aprobado el comercio.
 
@@ -89,9 +85,8 @@ Asegurate de configurar correctamente los estados de la orden según corresponda
 
 Para el ambiente de Integración, puedes utilizar las siguientes credenciales para realizar pruebas:
 
-* Código de comercio: `597020000540`
-* Llave Privada: Se puede encontrar [aquí - private_key](https://github.com/TransbankDevelopers/transbank-webpay-credenciales/blob/master/integracion/Webpay%20Plus%20-%20CLP/597020000540.key)
-* Certificado Publico: Se puede encontrar [aquí - public_cert](https://github.com/TransbankDevelopers/transbank-webpay-credenciales/blob/master/integracion/Webpay%20Plus%20-%20CLP/597020000540.crt)
+* Código de comercio: `597055555532`
+* API Key: `579B532A7440BB0C9079DED94D31EA1615BACEB56610332264630D42D0A36B1C`
 
 
 1. Guardar los cambios presionando el botón [Guardar]
@@ -148,8 +143,6 @@ Puedes aceptar o rechazar la transacción
 
 ![demo9](img/demo9.png)
 
-![demo10](img/demo10.png)
-  
 * Serás redirigido a Opencart y podrás comprobar que el pago ha sido exitoso.
 
 ![demo11](img/demo11.png)
