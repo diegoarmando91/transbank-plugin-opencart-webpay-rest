@@ -62,7 +62,7 @@ class ControllerExtensionPaymentWebpayRest extends Controller {
 
         $url = $this->url->link('extension/payment/webpay_rest/callback', '', 'SSL');
         $url .= (parse_url($url, PHP_URL_QUERY) ? '&' : '?') . ('ph_=' . $paymentHash);
-        $url .= '&session_id=' . $this->session->getId();
+        $url .= '&ssid=' . $this->session->getId();
         $returnUrl = $url;
 
         $result = $transbankSdk->initTransaction($amount, $sessionId, $orderId, $returnUrl);
@@ -78,7 +78,7 @@ class ControllerExtensionPaymentWebpayRest extends Controller {
 
     public function callback() {
 
-        $sessionId = $_GET['session_id'];
+        $sessionId = $_GET['ssid'];
         $this->session->start($sessionId);
 
         $this->loadResources();
